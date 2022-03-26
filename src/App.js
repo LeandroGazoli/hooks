@@ -1,23 +1,49 @@
-import logo from './logo.svg';
-import './App.css';
+import { useState, useEffect, useMemo, useCallback } from "react";
 
 function App() {
+  const [tarefas, setTarefas] = useState([
+    "Pagar a conta de luz",
+    "Estudar reack hooks",
+  ]);
+
+  const [input, setInput] = useState([""]);
+
+  useEffect(() => {
+    const tarefasStorage = localStorage.getItem("tarefas");
+
+    if (tarefas) {
+      setTarefas(JSON.parse(tarefasStorage));
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("tarefas", JSON.stringify(tarefas));
+  }, [tarefas]);
+
+  const handleAdd = useCallback(() => {
+    setTarefas([...tarefas, input]);
+    setInput("");
+  }, [tarefas, input]);
+
+  const totalTarefas = useMemo(() => tarefas.length, [tarefas]);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <ul>
+        {tarefas.map((tarefa) => (
+          <li key={tarefa}>{tarefa}</li>
+        ))}
+      </ul>
+
+      <br />
+      <strong>você tem {totalTarefas} tarefas!</strong>
+
+      <input
+        type="text"
+        value={input}
+        onChange={(e) => setInput(e.target.value)}
+      />
+      <button onClick={handleAdd}> add</button>
     </div>
   );
 }
